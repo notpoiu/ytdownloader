@@ -4,6 +4,11 @@ very basic and i did it in like 2 hours
 
 also i used chatgpt for installation guide so lmk if there is anything wrong with it LOL
 
+
+> [!IMPORTANT]  
+> THIS IS FOR EDUCATIONAL PURPOSES ONLY DO NOT DO ANYTHING MALICIOUS WITH THIS<br>
+> I AM NOT LIABLE FOR THE DAMAGES DONE USING THIS TOOL
+
 ## Running from source
 
 Welcome to YTDownloader! This guide will walk you through the steps to get YTDownloader up and running on your machine.

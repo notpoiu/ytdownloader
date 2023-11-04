@@ -1,0 +1,4 @@
+Flask==2.3.2
+pytube==15.0.0
+pywebview==4.4.1
+tk

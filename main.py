@@ -8,7 +8,7 @@ import webview
 
 
 # Constants
-executable_dir = os.path.dirname(sys.executable)
+executable_dir = os.path.dirname(sys.executable) # when you are running from source, replace this with: os.path.dirname(os.path.realpath(__file__))
 path_to_downloaded = os.path.join(executable_dir, 'downloaded')
 
 app = Flask(__name__)

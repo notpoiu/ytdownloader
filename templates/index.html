@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Youtube Downloader</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: black;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+        }
+
+        #url {
+            /* From https://css.glass */
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+
+            width: 30%;
+            height: 100px;
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translate(-50%, 0%);
+
+            text-align: center;
+        }
+
+        #submit {
+            /* From https://css.glass */
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+
+            width: 100px;
+            height: 30px;
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translate(-50%, 0%);
+
+            text-align: center;
+        }
+
+        #statuscode {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Youtube downloader</h1>
+    <p>cool thinggy i made with flask and pytube 😱😱😱</p>
+
+    <p id="statuscode" style="color: green;"></p>
+
+    <textarea id="url"></textarea>
+
+    <button id="submit">Download!</button>
+    <script>
+        var isDownloading = false;
+        var textarea = document.querySelector('#url');
+        var submit = document.querySelector('#submit');
+        var statuscode = document.querySelector('#statuscode');
+
+        submit.onclick = function(){
+            var url = textarea.value;
+            statuscode.innerHTML = "Downloading "+url+" ...";
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/download', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.responseType = 'json';
+            xhr.onload = function(e) {
+                if (this.status == 200) {
+                    statuscode.innerHTML = "Downloaded video successfully! should be found in " + this.response["path"];
+                }else {
+                    alert("Error downloading video," + xhr.response["error"] + " please try again later.");
+                }
+            };
+            xhr.send(JSON.stringify({url: url}));
+        }
+    </script>
+  </body>
+</html>

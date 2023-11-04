@@ -4,7 +4,7 @@ very basic and i did it in like 2 hours
 
 also i used chatgpt for installation guide so lmk if there is anything wrong with it LOL
 
-# YTDownloader Installation Guide
+## Running from source
 
 Welcome to YTDownloader! This guide will walk you through the steps to get YTDownloader up and running on your machine.
 

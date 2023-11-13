@@ -1,6 +1,9 @@
 # YTDownloader
-Youtube downloader without ads 😱😱😱😱
-very basic and i did it in like 2 hours
+Youtube downloader without ads
+
+# TODO
+- add multiple formats such as mp3
+
 
 also i used chatgpt for installation guide so lmk if there is anything wrong with it LOL
 

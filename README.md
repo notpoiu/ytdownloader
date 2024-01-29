@@ -3,7 +3,6 @@ Youtube downloader without ads
 
 # TODO
 - add multiple formats such as mp3
-- make the flask server use streaming or websockets so we can change dynamically and not check every millisecond 😨 (event based api)
 
 
 also i used chatgpt for installation guide so lmk if there is anything wrong with it LOL

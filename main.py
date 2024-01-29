@@ -1,12 +1,8 @@
-from mutagen.mp4 import MP4, MP4Cover
 import pytube,os,requests,base64,re,sys
-import subprocess
-
-from threading import Thread
-import webview
+from mutagen.mp4 import MP4, MP4Cover
+import subprocess,webview
 
 def safe_filename(filename):
-    # Invlid_patterns was yoinked off of chatgpt, idk how to make regex
     invalid_patterns = [
         r'[#%&{}\\<>[*?$!/\'":@+`|=\-]',  # Matches any of the invalid characters, including '-' which should be escaped.
         r'\s+',                           # Matches any whitespace

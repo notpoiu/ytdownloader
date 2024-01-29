@@ -1,6 +1,6 @@
-from flask import Flask,render_template,request,jsonify
 from mutagen.mp4 import MP4, MP4Cover
 import pytube,os,requests,base64,re,sys
+import subprocess
 
 from threading import Thread
 import webview
@@ -30,51 +30,27 @@ def format_duration(seconds):
     else:
         return f"{seconds}s"
 
-# Constants
-executable_dir = os.path.dirname(sys.executable) # when you are running from source, replace this with: os.path.dirname(os.path.realpath(__file__))
-#executable_dir = os.path.dirname(os.path.realpath(__file__))
+# (Mostly) Constants
+executable_dir = os.path.dirname(os.path.realpath(__file__))
+
+if not os.path.dirname(sys.executable) == f"{os.path.expanduser('~')}\AppData\Local\Programs\Python\Python311":
+    executable_dir = os.path.dirname(sys.executable)
+
 path_to_downloaded = os.path.join(executable_dir, 'downloaded')
 
-app = Flask(__name__)
-
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', '*')
-    return response
-
-@app.route('/')
-def menu():
-    return render_template('index.html')
-
-
-"""
-/api/download
-
-POST request
-{
-    "url": "https://www.youtube.com/watch?v=5qap5aO4i9A",
-    "type": "mp4"
-}
-"""
-@app.route('/api/download', methods=['POST'])
-def download():
-    data = request.json
-
+def download(url,typeDownload):
     try:
-        print(data)
-        url = data['url']
         if "youtu.be" in url:
             url = url.split("?")[0]
 
-        file_ext = data.get("type", "mp4")
+        file_ext = "mp4" if typeDownload is None else typeDownload
         yt = pytube.YouTube(url)
 
         video_title = safe_filename(yt.title)
         file_path = os.path.join(path_to_downloaded, f"{video_title}.{file_ext}")
 
         if os.path.exists(file_path):
-            return jsonify({'error': 'Video already downloaded!'}), 400
+            return False
 
         yt.streams.filter(progressive=True, file_extension=file_ext).order_by('resolution').desc().first().download(output_path=path_to_downloaded, filename=f"{video_title}.{file_ext}")
         
@@ -88,33 +64,22 @@ def download():
             raise Exception("Failed to download image")
         video.save()
 
-        return jsonify({'path': file_path}), 200
+        return True
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 400
+        return False
 
-"""
-/api/getfiles
-
-POST request
-{
-    "currentChildrenCount": videoListPopulate.children.length
-}
-
-returns a JSON list of files in downloaded folder, their thumbnail and name aswell as their media length
-"""
-@app.route('/api/getfiles', methods=['POST'])
-def getfiles():
+def getfiles(currentChildrenCount):
     files = []
 
     if not os.path.isdir(path_to_downloaded):
         os.mkdir(path_to_downloaded)
 
     if len(os.listdir(path_to_downloaded)) == 0:
-        return jsonify({"message": "No files",'files': []}),200
+        return {"message": "No files",'files': []}
 
-    if request.json['currentChildrenCount'] == len(os.listdir(path_to_downloaded)):
-        return jsonify({'message': "Same child count", 'files': []}),200
+    if currentChildrenCount == len(os.listdir(path_to_downloaded)):
+        return {'message': "Same child count", 'files': []}
 
     for file in os.listdir(path_to_downloaded):
         if file.endswith(".mp4"):
@@ -132,23 +97,16 @@ def getfiles():
             except Exception as e:
                 print(e)
                 continue
-    return jsonify({"message":"Success!",'files': files}),200
+    return {"message":"Success!",'files': files}
 
-@app.route('/api/openfolder', methods=['GET'])
-def openfolder():
-    os.startfile(path_to_downloaded)
-    return jsonify({'success': True}),200
-
-def run_server():
-    app.run(host="0.0.0.0", port=5000)
+# would have prefered using os.system but meh whatever
+def openFolder(file_name):
+    subprocess.Popen(f'explorer /select,"{os.path.normpath(os.path.join(path_to_downloaded, file_name.replace(" ","_")))}.mp4"')
 
 if not os.path.isdir(path_to_downloaded):
     os.mkdir(path_to_downloaded)
 
-server = Thread(target=run_server)
-server.daemon = True
-server.start()
-
-webview.create_window("Youtube Downloader by upio", "http://localhost:5000", width=500, height=700, resizable=True, fullscreen=False, min_size=(800, 600), confirm_close=False)
+window = webview.create_window("Youtube Downloader by upio", "index.html", width=500, height=700, resizable=True, fullscreen=False, min_size=(800, 600), confirm_close=False)
+window.expose(openFolder,getfiles,download)
 webview.start()
 
